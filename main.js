@@ -362,7 +362,7 @@
     // then give it a deliberate upward departure.
     if (!callPlayed && elapsed >= gatherDuration) {
       callPlayed = true;
-      eagleCry();
+      //eagleCry();
     }
 
     var gatherEase = easeIO(gatherP);
