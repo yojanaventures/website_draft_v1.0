@@ -1,0 +1,182 @@
+/* ==========================================================
+   Yojna Ventures: countdown page
+   Palette is taken straight from the logo.
+   ========================================================== */
+
+:root {
+  --forest: #144a13;   /* logo plate: the page itself */
+  --deep:   #0b300b;   /* edges / vignette */
+  --leaf:   #5ac249;   /* "yojna" letters */
+  --lime:   #c1ff72;   /* "ventures" + terrain highlights */
+  --mist:   #e9ffd0;   /* soft light text */
+
+  --font-display: "Unbounded", "Helvetica Neue", Arial, sans-serif;
+  --font-body:    "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { background: var(--deep); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  color: var(--mist);
+  font-family: var(--font-body);
+  background:
+    radial-gradient(90% 70% at 18% 8%, #1d6a1c 0%, rgba(29, 106, 28, 0) 60%),
+    radial-gradient(120% 100% at 50% 40%, var(--forest) 0%, var(--forest) 45%, var(--deep) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- terrain canvas ---------- */
+#terrain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+}
+
+/* ---------- logo ---------- */
+.logo {
+  margin: 0;
+  perspective: 1100px;
+}
+
+.logo-tilt {
+  position: relative;
+  display: block;
+  transform-style: preserve-3d;
+  transition: transform .35s cubic-bezier(.2, .7, .2, 1);
+  will-change: transform;
+}
+
+.logo-tilt img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* A brighter copy of the logo, only visible inside a soft circle of light
+   that follows the pointer (set from js/main.js). */
+.logo-lit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--lo, 0);
+  -webkit-mask-image: radial-gradient(circle var(--lr, 160px) at var(--lx, 50%) var(--ly, 50%), #000 0%, rgba(0, 0, 0, 0) 100%);
+          mask-image: radial-gradient(circle var(--lr, 160px) at var(--lx, 50%) var(--ly, 50%), #000 0%, rgba(0, 0, 0, 0) 100%);
+  transition: opacity .4s ease;
+}
+
+/* ---------- date + countdown ---------- */
+.opens {
+  margin: 0 0 .35rem;
+  color: var(--leaf);
+  font-size: .95rem;
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+
+.date {
+  margin: 0 0 1.9rem;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  color: var(--mist);
+}
+
+.clock {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  width: 100%;
+  max-width: 34rem;
+  border-top: 1px solid rgba(193, 255, 114, .28);
+  border-bottom: 1px solid rgba(193, 255, 114, .28);
+}
+
+.unit {
+  min-width: 0;
+  padding: 1.15rem clamp(.5rem, 1.3vw, 1.2rem) 1rem;
+}
+.unit + .unit { border-left: 1px solid rgba(193, 255, 114, .28); }
+.unit:first-child { padding-left: 0; }
+
+.num {
+  display: flex;
+  font-family: var(--font-display);
+  font-weight: 200;
+  font-size: clamp(1.55rem, 2.7vw, 2.6rem);
+  line-height: 1;
+  color: var(--lime);
+}
+/* Each digit sits in a fixed-width cell so the numbers never jitter as they tick. */
+.num .d { display: inline-block; width: .78em; text-align: left; }
+
+.lab {
+  display: block;
+  margin-top: .55rem;
+  font-size: .8rem;
+  font-weight: 500;
+  letter-spacing: .03em;
+  color: var(--leaf);
+}
+
+.note {
+  max-width: 36ch;
+  margin: 1.5rem 0 0;
+  font-size: .95rem;
+  line-height: 1.55;
+  color: rgba(233, 255, 208, .78);
+}
+
+.live {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  color: var(--lime);
+  padding: 1.2rem 0;
+}
+
+/* ---------- small screens ---------- */
+@media (max-width: 575.98px) {
+  .unit { padding-top: 1rem; padding-bottom: .9rem; }
+  .lab  { font-size: .7rem; letter-spacing: .01em; }
+  .date { margin-bottom: 1.5rem; }
+}
+
+/* ---------- one orchestrated entrance: logo first, then the date and clock ---------- */
+@keyframes arrive {
+  from { opacity: 0; transform: translateY(14px); filter: blur(8px); }
+  to   { opacity: 1; transform: none;             filter: blur(0); }
+}
+.logo-base { animation: arrive 1.2s cubic-bezier(.2, .7, .2, 1) both; }
+.info      { animation: arrive 1s   cubic-bezier(.2, .7, .2, 1) .55s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-base, .info { animation: none; }
+  .logo-tilt { transition: none; }
+}
+
+/* Quiet, deliberately cryptic statement */
+.note {
+  max-width: 31ch;
+  letter-spacing: .015em;
+  color: rgba(233, 255, 208, .82);
+}
